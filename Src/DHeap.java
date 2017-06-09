@@ -37,7 +37,8 @@ public class DHeap
 	 */
     public int arrayToHeap(DHeap_Item[] array1) 
     {
-        return 43; // just for illustration - should be replaced by student code
+        // TODO
+        return 0xDEADDEAD;
     }
 
     /**
@@ -48,6 +49,7 @@ public class DHeap
      *   
      */
     public boolean isHeap() {
+        // TODO
 		return true; // lol why would I return something else??
 	}
 
@@ -163,8 +165,42 @@ public class DHeap
 
 		return heapifyDown(0);
     }
-	
-	/**
+
+    private int heapifyDown(int item) {
+        return heapDown_rec(array[item]);
+    }
+
+    private int heapifyUp(int item) {
+        return heapUp_rec(array[item]);
+    }
+
+    private int heapUp_rec(DHeap_Item item) {
+        int parent = parent(item.getPos(), d);
+        //todo if parent == 0 we return 1 regardles of what happened
+
+        if (item.getKey() < array[parent].getKey()) {
+            switchItems(item, array[parent]);
+            if (parent != 0) {
+                return 1 + heapUp_rec(item);
+            }
+        }
+        return 1;
+    }
+
+    private int heapDown_rec(DHeap_Item item) {
+        int childStart = child(item.getPos(), 0, d);
+        // TODO if there's a no child return 0, otherwise find the minimum child, switch if smaller, return d or size - childStart
+        return 0xCAFEBABE;
+    }
+
+    private void switchItems(DHeap_Item item1, DHeap_Item item2)
+    {
+        int temp = item1.getPos();
+        item1.setPos(item2.getPos());
+        item2.setPos(temp);
+    }
+
+    /**
 	* Sort the input array using heap-sort (build a heap, and 
 	* perform n times: get-min, del-min).
 	* Sorting should be done using the DHeap, name of the items is irrelevant.
@@ -177,11 +213,13 @@ public class DHeap
 		DHeap heap = new DHeap(d, array1.length);
 		DHeap_Item []items = DHeap_Item.fromIntArray(array1);
 		int total = heap.arrayToHeap(items);
+
 		for (int i = 0; i < array1.length; ++i) {
 			DHeap_Item min = heap.Get_Min();
 			array1[min.getKey()] = min.getKey();
 			total += heap.Delete_Min();
 		}
+
 		return total;
 	}
 }
