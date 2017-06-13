@@ -4,7 +4,6 @@
 
 public class DHeap
 {
-	
     private int size, max_size, d;
     private DHeap_Item[] array;
 
@@ -37,8 +36,14 @@ public class DHeap
 	 */
     public int arrayToHeap(DHeap_Item[] array1) 
     {
-        // TODO
-        return 0xDEADDEAD;
+        array = new DHeap_Item[array1.length];
+        max_size = array1.length;
+        size = 0;
+        int total = 0;
+        for (int i = 0; i < array.length; ++i) {
+        	total += Insert(array1[i]);
+		}
+		return total;
     }
 
     /**
@@ -49,8 +54,12 @@ public class DHeap
      *   
      */
     public boolean isHeap() {
-        // TODO
-		return true; // lol why would I return something else??
+        if (size < 2) return true;
+        for (int i = 0; i < size; ++i) {
+			if ((array[i] == null) || (array[i].getPos() != i)) return false; // metadata failure
+			if (array[i].getKey() < array[parent(i, d)].getKey()) return false; // functionality failure
+		}
+		return true;
 	}
 
 
@@ -65,12 +74,12 @@ public class DHeap
      * Note that indices of arrays in Java start from 0.
      */
     public static int parent(int i, int d) {
-    	return Math.floorDiv(i, d);
+    	return (i != 0) ? (i-1)/d : 0;
     }
 
     public static int child(int i, int k, int d) {
-    	return d*i + k;
-	} // just for illustration - should be replaced by student code
+    	return d * i + k;
+	}
 
     /**
     * public int Insert(DHeap_Item item)
@@ -88,8 +97,8 @@ public class DHeap
     {
     	item.setPos(size);
     	array[size] = item;
-    	int ops = heapifyUp(size);
-    	size++;
+    	int ops = heapifyUp(size++);
+
 		return ops;
     }
 
@@ -163,7 +172,7 @@ public class DHeap
 		array[newPos] = array[size];
 		array[newPos].setPos(newPos);
 
-		return heapifyDown(0);
+		return heapifyDown(newPos);
     }
 
     private int heapifyDown(int item) {
@@ -175,9 +184,8 @@ public class DHeap
     }
 
     private int heapUp_rec(DHeap_Item item) {
+        if (item.getPos() == 0) return 0;
         int parent = parent(item.getPos(), d);
-        //todo if parent == 0 we return 1 regardles of what happened
-
         if (item.getKey() < array[parent].getKey()) {
             switchItems(item, array[parent]);
             if (parent != 0) {
@@ -188,12 +196,28 @@ public class DHeap
     }
 
     private int heapDown_rec(DHeap_Item item) {
-        int childStart = child(item.getPos(), 0, d);
-        // TODO if there's a no child return 0, otherwise find the minimum child, switch if smaller, return d or size - childStart
-        return 0xCAFEBABE;
+		int minChild = child(item.getPos(), 1, d);
+		if (minChild >= size) return 0; // no children;
+
+		int comps = 0;
+		for (int i = 2; i <= d; ++i) {
+			int current = child(item.getPos(), i, d);
+			if (current >= size) break;
+			if (array[minChild].getKey() > array[current].getKey()) {
+				minChild = current;
+			}
+			comps++;
+		}
+		if (array[minChild].getKey() == item.getKey()) {
+			return comps;
+		}
+		switchItems(array[minChild], item);
+		return comps + heapDown_rec(item);
+
+
     }
 
-    private void switchItems(DHeap_Item item1, DHeap_Item item2)
+	private void switchItems(DHeap_Item item1, DHeap_Item item2)
     {
         int temp = item1.getPos();
         item1.setPos(item2.getPos());
@@ -216,7 +240,7 @@ public class DHeap
 
 		for (int i = 0; i < array1.length; ++i) {
 			DHeap_Item min = heap.Get_Min();
-			array1[min.getKey()] = min.getKey();
+			array1[i] = min.getKey();
 			total += heap.Delete_Min();
 		}
 
