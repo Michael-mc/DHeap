@@ -4,7 +4,7 @@
 
 public class DHeap
 {
-    private int size, max_size, d;
+    int size, max_size, d;
     private DHeap_Item[] array;
 
 	// Constructor
@@ -56,8 +56,12 @@ public class DHeap
     public boolean isHeap() {
         if (size < 2) return true;
         for (int i = 0; i < size; ++i) {
-			if ((array[i] == null) || (array[i].getPos() != i)) return false; // metadata failure
-			if (array[i].getKey() < array[parent(i, d)].getKey()) return false; // functionality failure
+			if ((array[i] == null) )
+			    return false;
+			if (array[i].getPos() != i)
+			    return false; // metadata failure
+			if (array[i].getKey() < array[parent(i, d)].getKey())
+			    return false; // functionality failure
 		}
 		return true;
 	}
@@ -74,10 +78,12 @@ public class DHeap
      * Note that indices of arrays in Java start from 0.
      */
     public static int parent(int i, int d) {
-    	return (i != 0) ? (i-1)/d : 0;
+    	return Math.max(0, (i-1) / d);
     }
 
     public static int child(int i, int k, int d) {
+        assert k <= d;
+        assert k >= 1;
     	return d * i + k;
 	}
 
@@ -97,8 +103,9 @@ public class DHeap
     {
     	item.setPos(size);
     	array[size] = item;
-    	int ops = heapifyUp(size++);
-
+    	int ops = heapifyUp(size);
+    	size++;
+        assert isHeap();
 		return ops;
     }
 
@@ -168,19 +175,22 @@ public class DHeap
     public int Delete(DHeap_Item item)
     {
 		size--;
-		int newPos = item.getPos();
-		array[newPos] = array[size];
-		array[newPos].setPos(newPos);
-
-		return heapifyDown(newPos);
+		DHeap_Item replacement = array[size];
+		switchItems(item, replacement);
+		return heapifyUp(replacement.getPos()) + heapifyDown(replacement.getPos()); // delete min is still the same since heapifyUp returns with O(1)
     }
 
     private int heapifyDown(int item) {
-        return heapDown_rec(array[item]);
+        DHeap_Item i =array[item];
+        int ops = heapDown_rec(i);
+        isHeap();
+        return ops;
     }
 
     private int heapifyUp(int item) {
-        return heapUp_rec(array[item]);
+        int ops = heapUp_rec(array[item]);
+        //isHeap();
+        return ops;
     }
 
     private int heapUp_rec(DHeap_Item item) {
@@ -202,13 +212,15 @@ public class DHeap
 		int comps = 0;
 		for (int i = 2; i <= d; ++i) {
 			int current = child(item.getPos(), i, d);
-			if (current >= size) break;
-			if (array[minChild].getKey() > array[current].getKey()) {
+			if (current >= size) {
+			    break;
+			}
+			if (array[current].getKey() < array[minChild].getKey()) {
 				minChild = current;
 			}
 			comps++;
 		}
-		if (array[minChild].getKey() == item.getKey()) {
+		if (array[minChild].getKey() >= item.getKey()) {
 			return comps;
 		}
 		switchItems(array[minChild], item);
@@ -221,7 +233,10 @@ public class DHeap
     {
         int temp = item1.getPos();
         item1.setPos(item2.getPos());
+        array[item2.getPos()] = item1;
+
         item2.setPos(temp);
+        array[temp] = item2;
     }
 
     /**

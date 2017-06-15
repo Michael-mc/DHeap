@@ -40,7 +40,7 @@ public class DHeap_Item {
 		public static DHeap_Item[] fromIntArray(int[] array) {
 			DHeap_Item[] arr = new DHeap_Item[array.length];
 			for (int i = 0; i < array.length; ++i) {
-				arr[i] = new DHeap_Item(Integer.toString(i), i);
+				arr[i] = new DHeap_Item(Integer.toString(array[i]), array[i]);
 			}
 			return arr;
 		}
