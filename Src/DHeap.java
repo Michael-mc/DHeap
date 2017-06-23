@@ -112,8 +112,6 @@ public class DHeap
      * Complexity is O(1). small math operation
      */
     public static int child(int i, int k, int d) {
-        assert k <= d;
-        assert k >= 1;
         return d * i + k;
     }
 
@@ -137,7 +135,6 @@ public class DHeap
         array[size] = item;
         int ops = heapifyUp(size);
         size++;
-        assert isHeap();
         return ops;
     }
 
@@ -266,7 +263,7 @@ public class DHeap
         int minChild = child(item.getPos(), 1, d);
         if (minChild >= size) return 0; // no children;
 
-        int comps = 0;
+        int comps = 1; // count the comparison between the minChild and the item.
         for (int i = 2; i <= d; ++i) {
             int current = child(item.getPos(), i, d);
             if (current >= size) {
